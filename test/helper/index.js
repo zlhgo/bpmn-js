@@ -84,13 +84,13 @@ function bootstrapBpmnJS(BpmnJS, options, locals) {
       mockModule[k] = ['value', v];
     });
 
-    _options.modules = [].concat(_options.modules || [], [ mockModule ]);
+    _options.additionalModules = [].concat(_options.additionalModules || [], [ mockModule ]);
   }
 
-  _options.modules = unique(_options.modules);
+  _options.additionalModules = unique(_options.additionalModules);
 
-  if (!_options.modules.length) {
-    _options.modules = undefined;
+  if (!_options.additionalModules.length) {
+    _options.additionalModules = undefined;
   }
 
   BPMN_JS = new BpmnJS(_options);

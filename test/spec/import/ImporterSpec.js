@@ -23,7 +23,7 @@ describe('import - Importer', function() {
   function createDiagram() {
     return new Diagram({
       canvas: { container: container },
-      modules: Viewer.prototype._modules
+      modules: Viewer._viewerModules
     });
   }
 
