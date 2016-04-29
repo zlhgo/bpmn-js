@@ -247,6 +247,25 @@ describe('features/replace - bpmn replace', function() {
       expect(newElement.y).to.equal(task.y);
     }));
 
+    it('should keep label position', inject(function (elementRegistry, bpmnReplace, modeling) {
+
+      // given
+      var exclusiveGateway = elementRegistry.get('ExclusiveGateway_1');
+      var label = elementRegistry.get('ExclusiveGateway_1_label');
+
+      var newElementData =  {
+        type: 'bpmn:InclusiveGateway'
+      };
+
+      // when
+      var newElement = bpmnReplace.replaceElement(exclusiveGateway, newElementData);
+
+      // then
+      expect(newElement.label.x).to.equal(label.x);
+      expect(newElement.label.y).to.equal(label.y);
+
+    }));
+
   });
 
 
@@ -753,6 +772,86 @@ describe('features/replace - bpmn replace', function() {
 
   });
 
+  describe('morphing collapsed tasks / sub processes into expanded sub processes', function() {
+
+    var diagramXML = require('../../../fixtures/bpmn/features/replace/01_replace.bpmn');
+
+    beforeEach(bootstrapModeler(diagramXML, { modules: testModules }));
+
+
+    it('should allow morphing task into expanded sub process', inject(function(bpmnReplace, elementRegistry) {
+
+      // given
+      var element = elementRegistry.get('Task_1');
+      var newElementData = {
+        type: 'bpmn:SubProcess',
+        isExpanded: true
+      };
+
+      // when
+      var newElement = bpmnReplace.replaceElement(element, newElementData);
+
+      // then
+      expect(is(newElement, 'bpmn:SubProcess')).to.be.true;
+      expect(isExpanded(newElement)).to.be.true;
+    }));
+
+
+    it('should allow morphing collapsed sup process into expanded sub process', inject(function(bpmnReplace, elementRegistry) {
+
+      // given
+      var element = elementRegistry.get('SubProcessCollapsed');
+      var newElementData = {
+        type: 'bpmn:SubProcess',
+        isExpanded: true
+      };
+
+      // when
+      var newElement = bpmnReplace.replaceElement(element, newElementData);
+
+      // then
+      expect(is(newElement, 'bpmn:SubProcess')).to.be.true;
+      expect(isExpanded(newElement)).to.be.true;
+    }));
+
+
+    it('should allow morphing collapsed ad hoc into expanded ad hoc', inject(function(bpmnReplace, elementRegistry) {
+
+      // given
+      var element = elementRegistry.get('AdHocSubProcessCollapsed');
+      var newElementData = {
+        type: 'bpmn:SubProcess',
+        isExpanded: true
+      };
+
+      // when
+      var newElement = bpmnReplace.replaceElement(element, newElementData);
+
+      // then
+      expect(is(newElement, 'bpmn:AdHocSubProcess')).to.be.true;
+      expect(isExpanded(newElement)).to.be.true;
+    }));
+
+
+    it('should keep boundary events', inject(function(bpmnReplace, elementRegistry) {
+
+      // given
+      var element = elementRegistry.get('Task_1');
+      var newElementData = {
+        type: 'bpmn:SubProcess',
+        isExpanded: true
+      };
+
+      // when
+      var newElement = bpmnReplace.replaceElement(element, newElementData);
+
+      // then
+      expect(is(newElement, 'bpmn:SubProcess')).to.be.true;
+      expect(isExpanded(newElement)).to.be.true;
+      expect(newElement.attachers.length).to.be.equal(2);
+    }));
+
+  });
 
   describe('compensation activity', function() {
 
